@@ -1,0 +1,18 @@
+{
+    "multipart": [{
+            "apply": { "model": "colourfulportals:alone_colourful_altar" }
+            },{   
+		    "when": { "connected_north": "true" },
+            "apply": { "model": "colourfulportals:coloraltar_multipart_n"}  
+            },{
+			"when": { "connected_east": "true" },
+            "apply": { "model": "colourfulportals:coloraltar_multipart_n", "y": 90}
+            },{
+           "when": { "connected_south": "true" },
+            "apply": { "model": "colourfulportals:coloraltar_multipart_n", "y": 180}
+            },{
+           "when": { "connected_west": "true" },
+            "apply": { "model": "colourfulportals:coloraltar_multipart_n", "y": 270}
+            }
+    ]
+}
