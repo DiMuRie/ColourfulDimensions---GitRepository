@@ -2,14 +2,10 @@ package com.tmtravlr.cp.block;
 
 import java.util.Random;
 
-import org.lwjgl.opengl.GL11;
-
 import com.tmtravlr.cp.init.ColourfulBlocks;
 import com.tmtravlr.cp.init.ColourfulItems;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
-import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -17,12 +13,11 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -31,7 +26,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ColourfulAltar extends Block {
+public class ColourfulAltar extends Block{
 
 	public static final PropertyBool CONNECTED_NORTH = PropertyBool.create("connected_north");
 	public static final PropertyBool CONNECTED_SOUTH = PropertyBool.create("connected_south");
@@ -43,7 +38,7 @@ public class ColourfulAltar extends Block {
 		setCreativeTab(ColourfulItems.cpTab);
 		setUnlocalizedName("colourful_altar");
 		setRegistryName("colourful_altar");
-		setBlockUnbreakable();
+		this.setHardness(3);
 		this.setDefaultState(this.blockState.getBaseState().withProperty(CONNECTED_EAST, Boolean.FALSE).withProperty(CONNECTED_NORTH, Boolean.FALSE).withProperty(CONNECTED_SOUTH, Boolean.FALSE).withProperty(CONNECTED_WEST, Boolean.FALSE));
 		GameRegistry.register(this);
 		GameRegistry.register(new ItemBlock(this).setRegistryName(this.getRegistryName()));
@@ -52,6 +47,24 @@ public class ColourfulAltar extends Block {
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand)
+    {
+    	if(world.isRemote){
+			state = state.getBlock().getActualState(state, world, pos);
+			if(state.getBlock() == ColourfulBlocks.caltar) {
+				if(state.getValue(ColourfulAltar.CONNECTED_NORTH)){
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()+1D, (double)pos.getY(), pos.getZ()+1D, 1.0, 1.0, 1.0, new int[0]);}
+				if(state.getValue(ColourfulAltar.CONNECTED_EAST)){
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()+1D, (double)pos.getY(), pos.getZ()-1D, 1.0, 1.0, -1.0, new int[0]);;}
+				if(state.getValue(ColourfulAltar.CONNECTED_SOUTH)){
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()-1D, (double)pos.getY(), pos.getZ()-1D, -1.0, 1.0, -1.0, new int[0]);;}
+				if(state.getValue(ColourfulAltar.CONNECTED_WEST)){
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()-1D, (double)pos.getY(), pos.getZ()+1D, -1.0, 1.0, 1.0, new int[0]);;}
+			}
+    	}
+    }
+    
 	@SideOnly(Side.CLIENT)
     public BlockRenderLayer getBlockLayer()
     {
@@ -101,4 +114,6 @@ public class ColourfulAltar extends Block {
     	this.rand=rand;
     }
     @Override public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {return true;}
+    
 }
+

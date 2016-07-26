@@ -1,10 +1,13 @@
 package com.tmtravlr.cp;
 
+import com.tmtravlr.cp.dimension.ColourfulWorldProvider;
 import com.tmtravlr.cp.init.ColourfulBlocks;
 import com.tmtravlr.cp.init.ColourfulItems;
+import com.tmtravlr.cp.init.ColourfulTileEntities;
 import com.tmtravlr.cp.proxy.ICommonProxy;
 
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.world.DimensionType;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -12,7 +15,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid = CPLib.MODID, name = CPLib.NAME, version = CPLib.VERSION/*, acceptedMinecraftVersions = ""*/)
 public class CP {
@@ -23,13 +26,17 @@ public class CP {
 
 	@SidedProxy(clientSide = CPLib.CLIENT_PROXY_CLASS, serverSide = CPLib.SERVER_PROXY_CLASS)
 	public static ICommonProxy proxy;
+	
+	public DimensionType colourfulDimensionType;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
 		System.out.println(CPLib.MODID + " preinitialized");
 		ColourfulItems.init();
 		ColourfulBlocks.init();
+		ColourfulTileEntities.init();
 		proxy.preInit();
+		colourfulDimensionType = DimensionType.register("ColourfulPortalHub", "colourfulportals:", 17, ColourfulWorldProvider.class, true);      					
 		
 	}
 
@@ -38,6 +45,7 @@ public class CP {
 		System.out.println(CPLib.MODID + " initialized");
 		proxy.init();
 		proxy.registerEventHandlers();
+		DimensionManager.registerDimension(17, DimensionType.OVERWORLD);
 	}
 
 	@EventHandler

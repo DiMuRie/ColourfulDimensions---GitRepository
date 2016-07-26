@@ -1,0 +1,10 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "colourfulportals:colourful_pilar"
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}]
+  }
+}

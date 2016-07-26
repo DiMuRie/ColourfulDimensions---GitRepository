@@ -1,18 +1,20 @@
 {
-    "multipart": [{
-            "apply": { "model": "colourfulportals:alone_colourful_altar" }
-            },{   
-		    "when": { "connected_north": "true" },
-            "apply": { "model": "colourfulportals:coloraltar_multipart_n"}  
-            },{
-			"when": { "connected_east": "true" },
-            "apply": { "model": "colourfulportals:coloraltar_multipart_n", "y": 90}
-            },{
-           "when": { "connected_south": "true" },
-            "apply": { "model": "colourfulportals:coloraltar_multipart_n", "y": 180}
-            },{
-           "when": { "connected_west": "true" },
-            "apply": { "model": "colourfulportals:coloraltar_multipart_n", "y": 270}
-            }
-    ]
+    "variants": {
+        "connected_connected_east=false,connected_north=false,connected_south=false,connected_west=false": { "model": "colourfulportals:alone_colourful_altar" },
+        "connected_east=false,connected_north=true,connected_south=false,connected_west=false": { "model": "colourfulportals:alone_colourful_altar", "uvlock": true },
+        "connected_east=true,connected_north=false,connected_south=false,connected_west=false": { "model": "colourfulportals:alone_colourful_altar", "y": 90, "uvlock": true },
+        "connected_east=false,connected_north=false,connected_south=true,connected_west=false": { "model": "colourfulportals:alone_colourful_altar", "y": 180, "uvlock": true },
+        "connected_east=false,connected_north=false,connected_south=false,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "y": 270, "uvlock": true },
+        "connected_east=true,connected_north=true,connected_south=false,connected_west=false": { "model": "colourfulportals:alone_colourful_altar", "uvlock": true },
+        "connected_east=true,connected_north=false,connected_south=true,connected_west=false": { "model": "colourfulportals:alone_colourful_altar", "y": 90, "uvlock": true },
+        "connected_east=false,connected_north=false,connected_south=true,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "y": 180, "uvlock": true },
+        "connected_east=false,connected_north=true,connected_south=false,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "y": 270, "uvlock": true },
+        "connected_east=false,connected_north=true,connected_south=true,connected_west=false": { "model": "colourfulportals:alone_colourful_altar", "uvlock": true },
+        "connected_east=true,connected_north=false,connected_south=false,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "y": 90, "uvlock": true },
+        "connected_east=true,connected_north=true,connected_south=true,connected_west=false": { "model": "colourfulportals:alone_colourful_altar", "uvlock": true },
+        "connected_east=true,connected_north=false,connected_south=true,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "y": 90, "uvlock": true },
+        "connected_east=false,connected_north=true,connected_south=true,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "y": 180, "uvlock": true },
+        "connected_east=true,connected_north=true,connected_south=false,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "y": 270, "uvlock": true },
+        "connected_east=true,connected_north=true,connected_south=true,connected_west=true": { "model": "colourfulportals:alone_colourful_altar", "uvlock": true }
+    }
 }
