@@ -128,6 +128,7 @@ public class ColourfulAltar extends Block{
     
     public void generatePosSelector(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
+    	pos=pos.up(3);
     	//y pos blocks
     	worldIn.setBlockState(pos.down(2), ColourfulBlocks.x.getStateFromMeta(0));
     	worldIn.setBlockState(pos.down(), ColourfulBlocks.zx.getStateFromMeta(0));
@@ -145,8 +146,10 @@ public class ColourfulAltar extends Block{
     	worldIn.setBlockState(pos.east(2), ColourfulBlocks.zzzx.getStateFromMeta(0));
     }
     
+    @Nullable
     public void checkAndProcess(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn){
-    	int yyyc = ColourfulBlocks.zzzx.getMetaFromState(state);
+    	pos = pos.up(3);
+    	/*int yyyc = ColourfulBlocks.zzzx.getMetaFromState(state);
     	int yycy = ColourfulBlocks.zzx.getMetaFromState(state);
     	int ycyy = ColourfulBlocks.zx.getMetaFromState(state);
     	int cyyy = ColourfulBlocks.x.getMetaFromState(state);
@@ -159,7 +162,21 @@ public class ColourfulAltar extends Block{
     	int zzzc = ColourfulBlocks.zzzx.getMetaFromState(state);
     	int zzcz = ColourfulBlocks.zzx.getMetaFromState(state);
     	int zczz = ColourfulBlocks.zx.getMetaFromState(state);
-    	int czzz = ColourfulBlocks.x.getMetaFromState(state);
+    	int czzz = ColourfulBlocks.x.getMetaFromState(state);*/
+    	int yyyc = worldIn.getBlockState(pos.down(2)).getBlock().getMetaFromState(state);
+    	int yycy = worldIn.getBlockState(pos.down()).getBlock().getMetaFromState(state);
+    	int ycyy = worldIn.getBlockState(pos.up()).getBlock().getMetaFromState(state);
+    	int cyyy = worldIn.getBlockState(pos.up(2)).getBlock().getMetaFromState(state);
+    	
+    	int xxxc = worldIn.getBlockState(pos.south(2)).getBlock().getMetaFromState(state);
+    	int xxcx = worldIn.getBlockState(pos.south()).getBlock().getMetaFromState(state);
+    	int xcxx = worldIn.getBlockState(pos.north()).getBlock().getMetaFromState(state);
+    	int cxxx = worldIn.getBlockState(pos.north(2)).getBlock().getMetaFromState(state);
+    	
+    	int zzzc = worldIn.getBlockState(pos.west(2)).getBlock().getMetaFromState(state);
+    	int zzcz = worldIn.getBlockState(pos.west()).getBlock().getMetaFromState(state);
+    	int zczz = worldIn.getBlockState(pos.east()).getBlock().getMetaFromState(state);
+    	int czzz = worldIn.getBlockState(pos.east(2)).getBlock().getMetaFromState(state);
     	
     	int x = xxxc+ xxcx*10 + xcxx*100 + cxxx*1000;
     	int y = yyyc+ yycy*10 + ycyy*100 + cyyy*1000;
@@ -177,10 +194,10 @@ public class ColourfulAltar extends Block{
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
     {
     	if(playerIn.isSneaking()){
-    	generatePosSelector(worldIn, pos, state, rand);
+    	checkAndProcess(worldIn, pos, state, playerIn);
     	}
     	else{
-    		checkAndProcess(worldIn, pos, state, playerIn);
+    	generatePosSelector(worldIn, pos, state, rand);
     	}
     	return true;
 	}
