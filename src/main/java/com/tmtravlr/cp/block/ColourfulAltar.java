@@ -2,6 +2,8 @@ package com.tmtravlr.cp.block;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.tmtravlr.cp.init.ColourfulBlocks;
 import com.tmtravlr.cp.init.ColourfulItems;
 
@@ -13,10 +15,13 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -32,6 +37,7 @@ public class ColourfulAltar extends Block{
 	public static final PropertyBool CONNECTED_SOUTH = PropertyBool.create("connected_south");
 	public static final PropertyBool CONNECTED_WEST = PropertyBool.create("connected_west");
 	public static final PropertyBool CONNECTED_EAST = PropertyBool.create("connected_east");
+	static ColourfulPortal ColourfulPortal;
 	
 	public ColourfulAltar(){
 		super(Material.ROCK);
@@ -54,13 +60,17 @@ public class ColourfulAltar extends Block{
 			state = state.getBlock().getActualState(state, world, pos);
 			if(state.getBlock() == ColourfulBlocks.caltar) {
 				if(state.getValue(ColourfulAltar.CONNECTED_NORTH)){
-					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()+1D, (double)pos.getY(), pos.getZ()+1D, 1.0, 1.0, 1.0, new int[0]);}
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()+1D, (double)pos.getY(), pos.getZ()+1D, 1.0, .25, 1.0, new int[0]);
+					world.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, pos.getX()+1D, (double)pos.getY(), pos.getZ()+1D, 1.0, .25, 1.0, new int[0]);}
 				if(state.getValue(ColourfulAltar.CONNECTED_EAST)){
-					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()+1D, (double)pos.getY(), pos.getZ()-1D, 1.0, 1.0, -1.0, new int[0]);;}
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()+1D, (double)pos.getY(), pos.getZ()-1D, 1.0, .25, -1.0, new int[0]);;
+					world.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, pos.getX()+1D, (double)pos.getY(), pos.getZ()-1D, 1.0, .25, -1.0, new int[0]);;}
 				if(state.getValue(ColourfulAltar.CONNECTED_SOUTH)){
-					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()-1D, (double)pos.getY(), pos.getZ()-1D, -1.0, 1.0, -1.0, new int[0]);;}
-				if(state.getValue(ColourfulAltar.CONNECTED_WEST)){
-					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()-1D, (double)pos.getY(), pos.getZ()+1D, -1.0, 1.0, 1.0, new int[0]);;}
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()-1D, (double)pos.getY(), pos.getZ()-1D, -1.0, .25, -1.0, new int[0]);;
+					world.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, pos.getX()-1D, (double)pos.getY(), pos.getZ()-1D, -1.0, .25, -1.0, new int[0]);;}
+					if(state.getValue(ColourfulAltar.CONNECTED_WEST)){
+					world.spawnParticle(EnumParticleTypes.END_ROD, pos.getX()-1D, (double)pos.getY(), pos.getZ()+1D, -1.0, .25, 1.0, new int[0]);;
+					world.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, pos.getX()-1D, (double)pos.getY(), pos.getZ()+1D, -1.0, .25, 1.0, new int[0]);;}
 			}
     	}
     }
@@ -100,6 +110,7 @@ public class ColourfulAltar extends Block{
         Block block = iblockstate.getBlock();
         return block == ColourfulBlocks.cpillar;
     }
+	
     @Override
 	protected BlockStateContainer createBlockState () {
 	     
@@ -114,6 +125,65 @@ public class ColourfulAltar extends Block{
     	this.rand=rand;
     }
     @Override public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {return true;}
+    
+    public void generatePosSelector(World worldIn, BlockPos pos, IBlockState state, Random rand)
+    {
+    	//y pos blocks
+    	worldIn.setBlockState(pos.down(2), ColourfulBlocks.x.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.down(), ColourfulBlocks.zx.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.up(), ColourfulBlocks.zzx.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.up(2), ColourfulBlocks.zzzx.getStateFromMeta(0));
+    	//x pos blocks
+    	worldIn.setBlockState(pos.south(2), ColourfulBlocks.x.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.south(), ColourfulBlocks.zx.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.north(), ColourfulBlocks.zzx.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.north(2), ColourfulBlocks.zzzx.getStateFromMeta(0));
+    	//z pos blocks
+    	worldIn.setBlockState(pos.west(2), ColourfulBlocks.x.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.west(), ColourfulBlocks.zx.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.east(), ColourfulBlocks.zzx.getStateFromMeta(0));
+    	worldIn.setBlockState(pos.east(2), ColourfulBlocks.zzzx.getStateFromMeta(0));
+    }
+    
+    public void checkAndProcess(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn){
+    	int yyyc = ColourfulBlocks.zzzx.getMetaFromState(state);
+    	int yycy = ColourfulBlocks.zzx.getMetaFromState(state);
+    	int ycyy = ColourfulBlocks.zx.getMetaFromState(state);
+    	int cyyy = ColourfulBlocks.x.getMetaFromState(state);
+    	
+    	int xxxc = ColourfulBlocks.zzzx.getMetaFromState(state);
+    	int xxcx = ColourfulBlocks.zzx.getMetaFromState(state);
+    	int xcxx = ColourfulBlocks.zx.getMetaFromState(state);
+    	int cxxx = ColourfulBlocks.x.getMetaFromState(state);
+    	
+    	int zzzc = ColourfulBlocks.zzzx.getMetaFromState(state);
+    	int zzcz = ColourfulBlocks.zzx.getMetaFromState(state);
+    	int zczz = ColourfulBlocks.zx.getMetaFromState(state);
+    	int czzz = ColourfulBlocks.x.getMetaFromState(state);
+    	
+    	int x = xxxc+ xxcx*10 + xcxx*100 + cxxx*1000;
+    	int y = yyyc+ yycy*10 + ycyy*100 + cyyy*1000;
+    	int z = zzzc+ zzcz*10 + zczz*100 + czzz*1000;
+    	
+    	int dimension = playerIn.dimension;
+    	
+    	ColourfulPortal.setDestDim(dimension);
+    	
+    	ColourfulPortal.setDestPos(new BlockPos(x, y, z));
+    	
+    }
+    
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ)
+    {
+    	if(playerIn.isSneaking()){
+    	generatePosSelector(worldIn, pos, state, rand);
+    	}
+    	else{
+    		checkAndProcess(worldIn, pos, state, playerIn);
+    	}
+    	return true;
+	}
     
 }
 
