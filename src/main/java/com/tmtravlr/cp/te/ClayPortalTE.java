@@ -14,15 +14,17 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public class ColourfulPortalTE extends TileEntity{
+public class ClayPortalTE extends TileEntity{
 
-	public boolean isMaster = false;
+	public boolean visited = false;
+	public int portalNumberToShift = 0;
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
         super.writeToNBT(compound);
-        compound.setBoolean("visited", this.isMaster);
+        compound.setBoolean("visited", this.visited);
+        compound.setInteger("metadataToShift", this.portalNumberToShift);
         return compound;
     }
 	
@@ -30,7 +32,19 @@ public class ColourfulPortalTE extends TileEntity{
 	public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
-        this.isMaster = compound.getBoolean("visited");
+        this.visited = compound.getBoolean("visited");
+        this.portalNumberToShift = compound.getInteger("metadataToShift");
+    }
+	
+	@Nullable
+    public SPacketUpdateTileEntity getUpdatePacket()
+    {
+        return new SPacketUpdateTileEntity(this.pos, 7, this.getUpdateTag());
+    }
+
+    public NBTTagCompound getUpdateTag()
+    {
+        return this.writeToNBT(new NBTTagCompound());
     }
 	
 }

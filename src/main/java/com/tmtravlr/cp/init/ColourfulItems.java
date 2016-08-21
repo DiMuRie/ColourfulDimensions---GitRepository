@@ -1,6 +1,6 @@
 package com.tmtravlr.cp.init;
 
-import com.tmtravlr.cp.item.RainbowTemplate;
+import com.tmtravlr.cp.item.Framer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -21,10 +21,10 @@ public class ColourfulItems {
 		}
 	};
 	
-	public static RainbowTemplate rainbowTemplate;
+	public static Framer rainbowTemplate;
 	
 	public static void init(){
-		rainbowTemplate = new RainbowTemplate();
+		rainbowTemplate = new Framer();
 	}
 	
 	public static void initModels(){

@@ -8,9 +8,14 @@ import javax.annotation.Nullable;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraftforge.common.util.Constants;
+
+/*
+ * THE AUTHOR OF this class is Choonster.go give him a hug.go now,my child.-DiMuRie
+ */
 
 public class ColourfulWorldData extends WorldSavedData {
 
@@ -20,12 +25,12 @@ public class ColourfulWorldData extends WorldSavedData {
 	/**
 	 * The location list.
 	 */
-	private final List<CPPos> locationList = new LinkedList<CPPos>();
+	private final List<BlockPos> locationList = new LinkedList<BlockPos>();
 
 	/**
 	 * A read-only view of the location list
 	 */
-	private final List<CPPos> locationListUnmodifiable = Collections.unmodifiableList(locationList);
+	private final List<BlockPos> locationListUnmodifiable = Collections.unmodifiableList(locationList);
 
 	private ColourfulWorldData() {
 		super(DATA_NAME);
@@ -78,7 +83,7 @@ public class ColourfulWorldData extends WorldSavedData {
 	 *
 	 * @return A read-only view of the location list
 	 */
-	public List<CPPos> getLocationList() {
+	public List<BlockPos> getLocationList() {
 		return locationListUnmodifiable;
 	}
 
@@ -87,7 +92,7 @@ public class ColourfulWorldData extends WorldSavedData {
 	 *
 	 * @param location The location
 	 */
-	public void addLocation(CPPos location) {
+	public void addLocation(BlockPos location) {
 		locationList.add(location);
 	}
 
@@ -96,7 +101,7 @@ public class ColourfulWorldData extends WorldSavedData {
 	 *
 	 * @param location The location
 	 */
-	public void removeLocation(CPPos location) {
+	public void removeLocation(BlockPos location) {
 		locationList.remove(location);
 	}
 
@@ -113,8 +118,8 @@ public class ColourfulWorldData extends WorldSavedData {
 			// Get the location compound tag from the list tag
 			final NBTTagCompound locationTag = portalLocations.getCompoundTagAt(i);
 
-			// Create a new CPPos from the saved data
-			final CPPos location = new CPPos(locationTag.getInteger("posX"), locationTag.getInteger("posY"), locationTag.getInteger("posZ"), locationTag.getInteger("dimension"), locationTag.getInteger("metadata"));
+			// Create a new BlockPos from the saved data
+			final BlockPos location = new BlockPos(locationTag.getInteger("posX"), locationTag.getInteger("posY"), locationTag.getInteger("posZ"));
 
 			// Add it to the location list
 			locationList.add(location);
@@ -127,14 +132,12 @@ public class ColourfulWorldData extends WorldSavedData {
 		final NBTTagList portalLocations = new NBTTagList();
 
 		// For each location in the current location list
-		for (CPPos location : locationList) {
+		for (BlockPos location : locationList) {
 			// Save the location to a compound tag
 			final NBTTagCompound locationTag = new NBTTagCompound();
-			locationTag.setInteger("metadata", location.portalMetadata);
-			locationTag.setInteger("posX", location.pos.getX());
-			locationTag.setInteger("posY", location.pos.getY());
-			locationTag.setInteger("posZ", location.pos.getZ());
-			locationTag.setInteger("dimension", location.dimension);
+			locationTag.setInteger("posX", location.getX());
+			locationTag.setInteger("posY", location.getY());
+			locationTag.setInteger("posZ", location.getZ());
 
 			// Add it to the list tag
 			portalLocations.appendTag(locationTag);

@@ -2,6 +2,7 @@ package com.tmtravlr.cp;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -24,8 +25,6 @@ public class CPLib {
 	public static final String CLIENT_PROXY_CLASS = "com.tmtravlr.cp.proxy.ClientProxy";
 	public static final String SERVER_PROXY_CLASS = "com.tmtravlr.cp.proxy.ServerProxy";
 	
-	public static List<ColourfulPortal> cpBlocks = new ArrayList<ColourfulPortal>();
-	
 	static World world;
 	
 	public static boolean useDestinationBlackList = false;
@@ -38,27 +37,29 @@ public class CPLib {
 	public static int[] dimensionBlackList = new int[0];
 	public static int[] dimensionWhiteList = { 0, 1, -1 };
 	
+	public static HashMap<Integer, ColourfulPortal> cpBlocks = new HashMap();
+	
 	
 	public String portalSufix = "_cp";//Probably not gunna use < but still gunna put it here
 	
 	//now.let`s start with our lib methods.for science and colourfulness.yeah.......cue the methods!
 	
 	public static boolean isCPBlock(Block block){
-		return cpBlocks.contains(block);
+		return cpBlocks.containsValue(block);
 	}
 	
-	public static int getShiftedCPMetadata(IBlockAccess iba, BlockPos pos)
+	/*public static int getShiftedCPMetadata(IBlockAccess iba, BlockPos pos)
 	{
 		IBlockState state = iba.getBlockState(pos);
 		return getShiftedCPMetadata(state);
-	}
+	}*/
 	
 	public static int getIndexFromShiftedMetadata(int meta)
 	{
 		return (int)Math.floor(meta / 16);
 	}
 
-	public static int getShiftedCPMetadata(IBlockState state)
+	public static int getShiftedClaymaPMetadata(IBlockState state)
 	{
 		for (int i = 0; i < cpBlocks.size(); i++) {
 			if ((cpBlocks.get(i) == state.getBlock())) {
@@ -148,20 +149,16 @@ public class CPLib {
 	
 	public static void checkForPortalChanges(World world)
 	{
-		ArrayList<CPPos> toDelete = new ArrayList<CPPos>();
+		ArrayList<BlockPos> toDelete = new ArrayList<BlockPos>();
 		final ColourfulWorldData colourfulWorldData = ColourfulWorldData.get(world);
 
 		if (colourfulWorldData != null) {
-			for (CPPos portal : colourfulWorldData.getLocationList())
+			for (BlockPos portal : colourfulWorldData.getLocationList())
 			{
-				WorldServer currentWS = world.getMinecraftServer().worldServerForDimension(portal.dimension);
-				BlockPos currentPos = portal.pos;
-				if ((getCPBlockByShiftedMetadata(portal.portalMetadata) != currentWS.getBlockState(currentPos).getBlock())) {
-					toDelete.add(portal);
-				}
+				toDelete.add(portal);
 			}
 
-			for (CPPos deleted : toDelete) {
+			for (BlockPos deleted : toDelete) {
 				colourfulWorldData.removeLocation(deleted);
 			}
 
@@ -169,19 +166,19 @@ public class CPLib {
 		}
 	}
 
-	public static CPPos getColourfulDestination(World world, BlockPos pos)
+	public static BlockPos getColourfulDestination(World world, BlockPos pos)
 	{
 		final ColourfulWorldData colourfulWorldData = ColourfulWorldData.get(world);
 		if (colourfulWorldData == null || colourfulWorldData.getLocationList().size() <= 0) {
-			return new CPPos(pos, world.provider.getDimension(), getShiftedCPMetadata(world, pos));
+			return new BlockPos(pos);
 		}
 
-		final List<CPPos> locationList = colourfulWorldData.getLocationList();
-		CPPos start = findCPPos(world, pos);
+		final List<BlockPos> locationList = colourfulWorldData.getLocationList();
+		BlockPos start = findBlockPos(world, pos);
 
 		int originalPos = locationList.indexOf(start);
 		if (originalPos == -1) {
-			return new CPPos(pos, world.provider.getDimension(), getShiftedCPMetadata(world, pos));
+			return new BlockPos(pos);
 		}
 		int size = locationList.size();
 		for (int i = 0; i < size; i++) {
@@ -189,24 +186,22 @@ public class CPLib {
 			if (index >= size) {
 				index -= size;
 			}
-			CPPos current = locationList.get(index);
-			if (current.portalMetadata == start.portalMetadata) {
-				if (world.getMinecraftServer().worldServerForDimension(current.dimension) != null) {
-					return current;
-				}
+			BlockPos current = locationList.get(index);
+			if (world.getMinecraftServer() != null) {
+				return current;
 			}
 		}
 
 		return start;
 	}
 
-	public static CPPos findCPPos(World world, BlockPos pos)
+	public static BlockPos findBlockPos(World world, BlockPos pos)
 	{
 		if (!isCPBlock(world.getBlockState(pos).getBlock())) {
 			return null;
 		}
 		if (isCPBlock(world.getBlockState(pos).getBlock())) {
-			return new CPPos(pos, world.provider.getDimension(), getShiftedCPMetadata(world, pos));
+			return new BlockPos(pos);
 		}
 		boolean xDir = true;
 		boolean yDir = true;
@@ -214,9 +209,9 @@ public class CPLib {
 		int i = 0;
 		
 		CPLSet visited = new CPLSet();
-		Stack<CPPos> toVisit = new Stack<CPPos>();
+		Stack<BlockPos> toVisit = new Stack<BlockPos>();
 
-		toVisit.push(new CPPos(pos, world.provider.getDimension(), getShiftedCPMetadata(world, pos)));
+		toVisit.push(new BlockPos(pos));
 
 		visited.add(toVisit.peek());
 		final ColourfulWorldData colourfulWorldData = ColourfulWorldData.get(world);
@@ -224,24 +219,24 @@ public class CPLib {
 			return null;
 		}
 
-		final List<CPPos> locationList = colourfulWorldData.getLocationList();
+		final List<BlockPos> locationList = colourfulWorldData.getLocationList();
 
 		while (!toVisit.empty()) {
-			CPPos current = toVisit.pop();
+			BlockPos current = toVisit.pop();
 			if (locationList.contains(current)) {
 				return current;
 			}
-			BlockPos currentPos = current.pos;
+			BlockPos currentPos = current;
 			if ((zDir) || (xDir)) {
 				if (isCPBlock(world.getBlockState(currentPos.add(0, 1, 0)).getBlock())) {
-					CPPos temp = new CPPos(currentPos.add(0, 1, 0), world.provider.getDimension(), getShiftedCPMetadata(world, currentPos.add(0, 1, 0)));
+					BlockPos temp = new BlockPos(currentPos.add(0, 1, 0));
 					if (!visited.contains(temp)) {
 						toVisit.push(temp);
 						visited.add(temp);
 					}
 				}
 				if (isCPBlock(world.getBlockState(currentPos.add(0, -1, 0)).getBlock())) {
-					CPPos temp = new CPPos(currentPos.add(0, -1, 0), world.provider.getDimension(), getShiftedCPMetadata(world, currentPos.add(0, -1, 0)));
+					BlockPos temp = new BlockPos(currentPos.add(0, -1, 0));
 					if (!visited.contains(temp)) {
 						toVisit.push(temp);
 						visited.add(temp);
@@ -250,14 +245,14 @@ public class CPLib {
 			}
 			if ((zDir) || (yDir)) {
 				if (isCPBlock(world.getBlockState(currentPos.add(1, 0, 0)).getBlock())) {
-					CPPos temp = new CPPos(currentPos.add(1, 0, 0), world.provider.getDimension(), getShiftedCPMetadata(world, currentPos.add(1, 0, 0)));
+					BlockPos temp = new BlockPos(currentPos.add(1, 0, 0));
 					if (!visited.contains(temp)) {
 						toVisit.push(temp);
 						visited.add(temp);
 					}
 				}
 				if (isCPBlock(world.getBlockState(currentPos.add(-1, 0, 0)).getBlock())) {
-					CPPos temp = new CPPos(currentPos.add(-1, 0, 0), world.provider.getDimension(), getShiftedCPMetadata(world, currentPos.add(-1, 0, 0)));
+					BlockPos temp = new BlockPos(currentPos.add(-1, 0, 0));
 					if (!visited.contains(temp)) {
 						toVisit.push(temp);
 						visited.add(temp);
@@ -266,14 +261,14 @@ public class CPLib {
 			}
 			if ((yDir) || (xDir)) {
 				if (isCPBlock(world.getBlockState(currentPos.add(0, 0, 1)).getBlock())) {
-					CPPos temp = new CPPos(currentPos.add(0, 0, 1), world.provider.getDimension(), getShiftedCPMetadata(world, currentPos.add(0, 0, 1)));
+					BlockPos temp = new BlockPos(currentPos.add(0, 0, 1));
 					if (!visited.contains(temp)) {
 						toVisit.push(temp);
 						visited.add(temp);
 					}
 				}
 				if (isCPBlock(world.getBlockState(currentPos.add(0, 0, -1)).getBlock())) {
-					CPPos temp = new CPPos(currentPos.add(0, 0, -1), world.provider.getDimension(), getShiftedCPMetadata(world, currentPos.add(0, 0, -1)));
+					BlockPos temp = new BlockPos(currentPos.add(0, 0, -1));
 					if (!visited.contains(temp)) {
 						toVisit.push(temp);
 						visited.add(temp);
@@ -285,7 +280,7 @@ public class CPLib {
 		return null;
 	}
 	
-	public static void deletePortal(World world, CPPos locToDelete)
+	public static void deletePortal(World world, BlockPos locToDelete)
 	{
 		final ColourfulWorldData colourfulData = ColourfulWorldData.get(world);
 		if (colourfulData != null) {
@@ -294,7 +289,7 @@ public class CPLib {
 		}
 	}
 
-	public static boolean addPortalToList(World world, CPPos newLocation)
+	public static boolean addPortalToList(World world, BlockPos newLocation)
 	{
 		final ColourfulWorldData colourfulData = ColourfulWorldData.get(world);
 		if (colourfulData != null && !colourfulData.getLocationList().contains(newLocation)) {
@@ -306,7 +301,7 @@ public class CPLib {
 		return false;
 	}
 
-	public static class CPLSet extends TreeSet<CPPos>
+	public static class CPLSet extends TreeSet<BlockPos>
 	{
 		public CPLSet()
 		{
@@ -314,19 +309,13 @@ public class CPLib {
 		}
 	}
 
-	public static Comparator<CPPos> CPLcomparator = new Comparator<CPPos>()
+	public static Comparator<BlockPos> CPLcomparator = new Comparator<BlockPos>()
 			{
 
 		@Override
-		public int compare(CPPos first, CPPos second)
+		public int compare(BlockPos first, BlockPos second)
 		{
-			if (first.portalMetadata != second.portalMetadata) {
-				return second.portalMetadata - first.portalMetadata;
-			}
-			if (first.dimension != second.dimension) {
-				return second.dimension - first.dimension;
-			}
-			return first.pos.compareTo(second.pos);
+			return first.compareTo(second);
 		}
 			};
 

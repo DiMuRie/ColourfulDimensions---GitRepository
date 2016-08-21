@@ -2,20 +2,18 @@ package com.tmtravlr.cp;
 
 import net.minecraft.util.math.BlockPos;
 
-public class CPPos {
+public class CPPos extends Object {
 	
 	public BlockPos pos;
 	public int dimension;
-	public int portalMetadata;
 
-	public CPPos(int xPos, int yPos, int zPos, int dimension, int portalMetadata) {
-		this(new BlockPos(xPos, yPos, zPos), dimension, portalMetadata);
+	public CPPos(int xPos, int yPos, int zPos, int dimension) {
+		this(new BlockPos(xPos, yPos, zPos), dimension);
 	}
 
-	public CPPos(BlockPos pos, int dimension, int portalMetadata) {
+	public CPPos(BlockPos pos, int dimension) {
 		this.pos = pos;
 		this.dimension = dimension;
-		this.portalMetadata = portalMetadata;
 	}
 
 	@Override
@@ -25,12 +23,12 @@ public class CPPos {
 		}
 
 		final CPPos other = (CPPos) o;
-		return (this.pos.equals(other.pos)) && (this.dimension == other.dimension) && (this.portalMetadata == other.portalMetadata);
+		return (this.pos.equals(other.pos)) && (this.dimension == other.dimension);
 	}
 
 	@Override
 	public String toString() {
-		return "CPL[meta=" + this.portalMetadata + ", pos=" + this.pos.toString() + ", dim=" + this.dimension + "]";
+		return "CPL[meta=" + ", pos=" + this.pos.toString() + ", dim=" + this.dimension + "]";
 	}
 	
 }
